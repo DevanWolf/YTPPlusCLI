@@ -27,9 +27,9 @@
     "clear": "^0.1.0",
     "clui": "^0.3.6",
     "ffmpeg-cli": "^2.7.1",
-    "ffprobe-client": "^1.1.6",
     "figlet": "^1.5.0",
     "inquirer": "^7.3.3",
+    "mediainfo-static": "^1.0.5",
     "minimist": "^1.2.5"
   }
 }

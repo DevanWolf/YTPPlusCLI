@@ -1,7 +1,7 @@
 const global = require("../libs/global");
 
 module.exports = {
-  plugin: (video, width, height, temp, shared) => {
+  plugin: (video, toolbox, cwd) => {
     console.log("plugin!")
     return true
   }

@@ -1,8 +1,7 @@
 //unused right now
 const fs = require('fs');
-fs.readdirSync(__dirname + '/plugins/').forEach(function(file) { //add plugins to global
+fs.readdirSync(process.cwd() + '/plugins/').forEach(function(file) {
   if (file.match(/\.js$/) !== null && file !== 'index.js') {
-      var name = file.replace('.js', '');
-      exports[name] = require('./plugins/' + file);
+      exports[file] = require('../plugins/' + file);
   }
 });

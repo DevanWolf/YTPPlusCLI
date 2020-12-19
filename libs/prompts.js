@@ -58,10 +58,28 @@ module.exports = {
         message: 'Enter the maximum stream duration:'
       },
       {
+        name: 'width',
+        type: 'number',
+        default: argv.width || 640,
+        message: 'Enter the video width:'
+      },
+      {
+        name: 'height',
+        type: 'number',
+        default: argv.height || 480,
+        message: 'Enter the video height:'
+      },
+      {
+        name: 'fps',
+        type: 'number',
+        default: argv.fps || 30,
+        message: 'Enter the video FPS:'
+      },
+      {
         name: 'usetransitions',
         type: 'confirm',
         default: argv.usetransitions || true,
-        message: 'Use transition clips if available?'
+        message: 'Use transition clips at random?'
       }
     ];
     return inquirer.prompt(questions);

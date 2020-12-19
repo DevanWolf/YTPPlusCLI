@@ -1,26 +1,58 @@
 //unused right now
 const fs = require("fs"),
-    ffmpeg = require("ffmpeg-cli");
+    ffmpeg = require("ffmpeg-cli"),
+    { execSync } = require('child_process'),
+    mediainfo = require('mediainfo-static');
 module.exports = {
-    getLength: (file,callback) => {
-        return this.getVideoLength(file,callback)
+    getVideoProbe: (video) => {
+        //https://www.npmjs.com/package/video-length
+        //not using package due to invalid params with mediainfo-static
+        let vid = `"${video.replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}"`;
+        let stdout = execSync(mediainfo.path+" "+vid+' --full --output=JSON');
+        if(stdout) {
+            let specs = JSON.parse(stdout.toString());
+            let { track } = specs.media;
+            if(!track){
+                throw new TypeError('Can\'t extract video specs');
+            }
+            // General info
+            let general_specs = track.find(i => i['@type'] == 'General');
+            if(!general_specs){
+                throw new TypeError('Can\'t find "General" specs');
+            }
+            // Video track specs
+            let video_specs = track.find(i => i['@type'] == 'Video');
+            if(!video_specs){
+                throw new TypeError('Can\'t find "Video" track');
+            }
+            let { Duration, FrameRate, OverallBitRate, FileSize } = general_specs;
+            let { Width, Height } = video_specs;
+            return {
+                duration : parseFloat(Duration),
+                width    : parseFloat(Width),
+                height   : parseFloat(Height),
+                fps      : parseFloat(FrameRate),
+                bitrate  : parseFloat(OverallBitRate),
+                size     : parseFloat(FileSize),
+            };
+        }
     },
     snipVideo: (video, startTime, endTime, output, resolution, fps) => {
-        var args = " -i \"" + video
-            + "\" -ss " + startTime.getTimeStamp()
-            + " -to " + endTime.getTimeStamp()
+        var args = " -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}`
+            + "\" -ss " + startTime
+            + " -to " + endTime
             + " -ac 1"
             + " -ar 44100"
-            + " -vf scale="+resolution[0]+"x"+resolution[1]+",fps=fps="+fps
+            + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
             + " -y"
             + " " + output + ".mp4";
         return ffmpeg.runSync(args);
     },
     copyVideo: (video, output, resolution, fps) => {
-        var args =" -i \"" + video
+        var args =" -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}`
             + "\" -ar 44100"
             + " -ac 1"
-            + " -vf scale="+resolution[0]+"x"+resolution[1]+",fps=fps="+fps
+            + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
             + " -y"
             + " " + output + ".mp4";
         return ffmpeg.runSync(args);
@@ -28,21 +60,21 @@ module.exports = {
     concatenateVideo: (count, out) => {
         var command1 = "";
         for (var i=0; i<count; i++) {
-            if (fs.existsSync(this.TEMP + "video" + i + ".mp4") == true) {
-                command1 = command1.concat(" -i \"" + this.TEMP + "video" + i + ".mp4\""); //quotes
+            if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
+                command1 = command1.concat(" -i \"" + process.cwd()+"/shared/temp/video" + i + ".mp4\""); 
             }
         }
         command1 = command1.concat(" -filter_complex \"");
         var realcount = 0;
-        for (i=0; i<count; i++) {
-            if (fs.existsSync(this.TEMP + "video" + i + ".mp4") == true) {
+        for (var i=0; i<count; i++) {
+            if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
                 realcount+=1;
             }
         }
-        for (i=0; i<realcount; i++) {
+        for (var i=0; i<realcount; i++) {
             command1 = command1.concat("[" + i + ":v:0][" + i + ":a:0]");
         }
         command1=command1.concat("concat=n=" + realcount + ":v=1:a=1[outv][outa]\" -map \"[outv]\" -map \"[outa]\" -y " + out); 
-        return ffmpeg.run(command1);
+        return ffmpeg.runSync(`${command1.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : /\//g))}`);
     }
 }
