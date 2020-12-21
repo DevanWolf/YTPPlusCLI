@@ -71,6 +71,8 @@ function randomInt(min, max) {
 function cleanUp(clips) {
 	if (fs.existsSync(process.cwd()+"/shared/temp/temp.mp4"))
 		fs.rmSync(process.cwd()+"/shared/temp/temp.mp4");
+	if (fs.existsSync(process.cwd()+"/concat.txt"))
+		fs.rmSync(process.cwd()+"/concat.txt")
 	for (var i=0; i<clips; i++) {
 		if (fs.existsSync(process.cwd()+"/shared/temp/video"+i+".mp4")) {
 			fs.rmSync(process.cwd()+"/shared/temp/video"+i+".mp4");
