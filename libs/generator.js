@@ -1,7 +1,8 @@
 
 const fs = require("fs"),
 	global = require("./global"),
-	plugins = require("./plugins");
+	plugins = require("./plugins"),
+	chalk = require("chalk");
 
 function go(toolbox) {
 	const inputfiles = fs.readFileSync(toolbox.input).toString().split("\n");
@@ -34,16 +35,19 @@ function go(toolbox) {
 			}
 			//Add a random effect to the video
 			var int = randomInt(0, toolbox.plugins.length+5);
-			if(int < toolbox.plugins.length) {
-				var effect = toolbox.plugins[int];
-				console.log("STARTING EFFECT ON CLIP " + i + " EFFECT " + effect);
-				var clipToWorkWith = process.cwd()+"/shared/temp/video" + i + ".mp4";
-				plugins[effect].plugin(clipToWorkWith, toolbox, process.cwd());
+			if(int < toolbox.plugins.length && toolbox.plugins.length != 0) {
+				if(toolbox.plugins[int] != "") {
+					var effect = toolbox.plugins[int];
+					console.log("STARTING EFFECT ON CLIP " + i + " EFFECT " + effect);
+					var clipToWorkWith = process.cwd()+"/shared/temp/video" + i + ".mp4";
+					plugins[effect].plugin(clipToWorkWith, toolbox, process.cwd());
+				}
 			}
 		}
 		global.concatenateVideo(toolbox.clips, toolbox.output);
 	} catch (ex) {
-		return console.error(ex);
+		process.stdin.resume();
+		return console.log(chalk.redBright(ex));
 	}
 	cleanUp(toolbox.clips);
 	fs.rmdirSync(process.cwd()+"/shared/temp/");

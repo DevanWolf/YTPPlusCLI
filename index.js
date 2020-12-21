@@ -1,3 +1,6 @@
+if(!process.cwd().includes("YTPPlusCLI")) {
+	process.chdir("YTPPlusCLI");
+}
 const chalk = require('chalk'),
 	clear = require('clear'),
 	figlet = require('figlet'),
@@ -18,18 +21,12 @@ if(!fs.existsSync(process.cwd()+"/plugins")) {
 	console.log(chalk.redBright("No plugin directory found! Process halted.\nReplace the 'plugins' folder in "+process.cwd()));
 	process.exit(1);
 } else if(!fs.existsSync(process.cwd()+"/shared")) {
-	console.log(chalk.redBright("No shared directory found! Process halted.\nReplace the 'shared' folder in "+process.cwd()));
-	process.exit(1);
-} else if(!fs.existsSync(process.cwd()+"/enabledplugins.txt")) {
-	plugins = fs.readdirSync(process.cwd()+'/plugins/').toString()
-	console.log(chalk.yellow("enabledplugins.txt was not found, all plugins have been enabled.\nReplace this file in "+process.cwd()+" or use a frontend to avoid this warning in the future."));
-} else {
-	plugins = fs.readFileSync(process.cwd()+"/enabledplugins.txt").toString()
+	console.log(chalk.yellow("No shared directory found!\nThe 'shared' directory has been created in "+process.cwd()));
+	fs.mkdirSync(process.cwd()+"/shared")
 }
 if(!fs.existsSync(process.cwd()+"/shared/temp")) {
 	fs.mkdirSync(process.cwd()+"/shared/temp");
 }
-console.log(chalk.blueBright("Plugins:\n--------\n")+chalk.cyanBright(plugins)+chalk.blueBright("\n--------"))
 const run = async () => {
 	if(argv.skip != null) {
 		return argv; //skip prompts
@@ -43,6 +40,13 @@ const run = async () => {
 	}
 };
 run().then((results) => {
+	console.log(results)
+	if(results.enabledplugins != null && results.enabledplugins != undefined && results.enabledplugins != "") {
+		plugins = fs.readFileSync(results.enabledplugins).toString()
+	} else {
+		plugins = ""
+	}
+	console.log(chalk.blueBright("Plugins:\n--------\n")+chalk.cyanBright(plugins)+chalk.blueBright("\n--------"))
 	results.plugins = plugins.split("\n")
 	generator(results);
 })
