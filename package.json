@@ -1,6 +1,6 @@
 {
   "name": "ytppluscli",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Node CLI for use in ytp+ studio.",
   "main": "index.js",
   "scripts": {

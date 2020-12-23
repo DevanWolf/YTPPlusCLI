@@ -12,8 +12,8 @@ function go(toolbox) {
 	if (fs.existsSync(toolbox.output)) {
 		fs.rmSync(toolbox.output);
 	}
-	cleanUp(toolbox.clips);
 	try {
+		cleanUp(toolbox.clips);
 		for (var i = 0; i < toolbox.clips; i++) {
 			doneCount = i/toolbox.clips;
 			var sourceToPick = inputfiles[randomInt(0, inputfiles.length)];
