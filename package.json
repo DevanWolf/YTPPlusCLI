@@ -1,6 +1,6 @@
 {
   "name": "ytppluscli",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Node CLI for use in ytp+ studio.",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,6 @@
     "mediainfo-static": "^1.0.5"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=13.0.0"
   }
 }

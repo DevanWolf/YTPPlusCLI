@@ -10,7 +10,7 @@ function go(toolbox) {
 		return;
 	}
 	if (fs.existsSync(toolbox.output)) {
-		fs.rmSync(toolbox.output);
+		fs.unlinkSync(toolbox.output);
 	}
 	try {
 		cleanUp(toolbox.clips);
@@ -70,12 +70,12 @@ function randomInt(min, max) {
 
 function cleanUp(clips) {
 	if (fs.existsSync(process.cwd()+"/shared/temp/temp.mp4"))
-		fs.rmSync(process.cwd()+"/shared/temp/temp.mp4");
+		fs.unlinkSync(process.cwd()+"/shared/temp/temp.mp4");
 	if (fs.existsSync(process.cwd()+"/concat.txt"))
-		fs.rmSync(process.cwd()+"/concat.txt")
+		fs.unlinkSync(process.cwd()+"/concat.txt")
 	for (var i=0; i<clips; i++) {
 		if (fs.existsSync(process.cwd()+"/shared/temp/video"+i+".mp4")) {
-			fs.rmSync(process.cwd()+"/shared/temp/video"+i+".mp4");
+			fs.unlinkSync(process.cwd()+"/shared/temp/video"+i+".mp4");
 			console.log(i + " Exists");
 		}
 	}
