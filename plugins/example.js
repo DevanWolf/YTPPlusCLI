@@ -1,4 +1,4 @@
-const global = require("../libs/global");
+const global = require("../global");
 
 module.exports = {
   plugin: (video, toolbox, cwd) => {

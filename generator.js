@@ -1,8 +1,7 @@
 
 const fs = require("fs"),
 	global = require("./global"),
-	plugins = require("./plugins"),
-	chalk = require("chalk");
+	plugins = require("./plugins");
 
 function go(toolbox) {
 	const inputfiles = fs.readFileSync(toolbox.input).toString().split("\n");
@@ -47,7 +46,8 @@ function go(toolbox) {
 		global.concatenateVideo(toolbox.clips, toolbox.output);
 	} catch (ex) {
 		process.stdin.resume();
-		return console.log(chalk.redBright(ex));
+		console.log("An error has occured.")
+		return console.log(ex);
 	}
 	cleanUp(toolbox.clips);
 	fs.rmdirSync(process.cwd()+"/shared/temp/");

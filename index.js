@@ -1,27 +1,24 @@
 if(!process.cwd().includes("YTPPlusCLI")) {
 	process.chdir("YTPPlusCLI");
 }
-const chalk = require('chalk'),
-	clear = require('clear'),
+const clear = require('clear'),
 	figlet = require('figlet'),
-	prompts = require("./libs/prompts"),
+	prompts = require("./prompts"),
 	fs = require('fs'),
 	package = JSON.parse(fs.readFileSync("./package.json")),
 	argv = require('minimist')(process.argv.slice(2)),
-	generator = require("./libs/generator");
+	generator = require("./generator");
 clear(); //clear screen
 console.log(
-	chalk.greenBright(
-		figlet.textSync('ytp+ cli', { horizontalLayout: 'full' }) + "\n" + package.homepage + "\nThis software is licensed under the GNU General Public License Version 3.0."
-	)
+	figlet.textSync('ytp+ cli', { horizontalLayout: 'full' }) + "\n" + package.homepage + "\nThis software is licensed under the GNU General Public License Version 3.0."
 );
 //errors and warnings
 let plugins
 if(!fs.existsSync(process.cwd()+"/plugins")) {
-	console.log(chalk.redBright("No plugin directory found! Process halted.\nReplace the 'plugins' folder in "+process.cwd()));
+	console.log("No plugin directory found! Process halted.\nReplace the 'plugins' folder in "+process.cwd());
 	process.exit(1);
 } else if(!fs.existsSync(process.cwd()+"/shared")) {
-	console.log(chalk.yellow("No shared directory found!\nThe 'shared' directory has been created in "+process.cwd()));
+	console.log("No shared directory found!\nThe 'shared' directory has been created in "+process.cwd());
 	fs.mkdirSync(process.cwd()+"/shared")
 }
 if(!fs.existsSync(process.cwd()+"/shared/temp")) {
@@ -46,7 +43,7 @@ run().then((results) => {
 	} else {
 		plugins = ""
 	}
-	console.log(chalk.blueBright("Plugins:\n--------\n")+chalk.cyanBright(plugins)+chalk.blueBright("\n--------"))
+	console.log("Plugins:\n--------\n"+plugins+"\n--------")
 	results.plugins = plugins.split("\n")
 	generator(results);
 })
