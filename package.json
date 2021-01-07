@@ -25,6 +25,7 @@
   "dependencies": {
     "clear": "^0.1.0",
     "cli-progress": "^3.8.2",
+    "lzma-native": "^6.0.0",
     "ffmpeg-cli": "^2.7.1",
     "figlet": "^1.5.0",
     "inquirer": "^7.3.3",
