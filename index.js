@@ -37,7 +37,12 @@ const run = async () => {
 	}
 };
 run().then((results) => {
-	console.log(results)
+	if(argv.debug != null || argv.debug != undefined) {
+		results.debug = argv.debug
+		console.log(results)
+	} else {
+		results.debug = false
+	}
 	if(results.enabledplugins != null && results.enabledplugins != undefined && results.enabledplugins != "") {
 		plugins = fs.readFileSync(results.enabledplugins).toString()
 	} else {

@@ -37,7 +37,7 @@ module.exports = {
             };
         }
     },
-    snipVideo: (video, startTime, endTime, output, resolution, fps) => {
+    snipVideo: (video, startTime, endTime, output, resolution, fps, debug) => {
         var args = " -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}`
             + "\" -ss " + startTime
             + " -to " + endTime
@@ -46,18 +46,18 @@ module.exports = {
             + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
             + " -y"
             + " " + output + ".mp4";
-        return ffmpeg.runSync(args);
+        return ffmpeg.runSync(args + (debug == false  ? " -hide_banner -loglevel warning" : ""));
     },
-    copyVideo: (video, output, resolution, fps) => {
+    copyVideo: (video, output, resolution, fps, debug) => {
         var args =" -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}`
             + "\" -ar 44100"
             + " -ac 1"
             + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
             + " -y"
             + " " + output + ".mp4";
-        return ffmpeg.runSync(args);
+        return ffmpeg.runSync(args + (debug == false  ? " -hide_banner -loglevel warning" : ""));
     },
-    concatenateVideo: (count, out) => {
+    concatenateVideo: (count, out, debug) => {
         var command1 = "";
         for (var i=0; i<count; i++) {
             if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
@@ -69,6 +69,6 @@ module.exports = {
             }
         }
         fs.writeFileSync("concat.txt",`${command1.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : /\//g))}`)
-        return ffmpeg.runSync("-f concat -safe 0 -i concat.txt -af aresample=async=1 "+out);
+        return ffmpeg.runSync("-f concat -safe 0 -i concat.txt -af aresample=async=1 "+out + (debug == false  ? " -hide_banner -loglevel warning" : ""));
     }
 }
