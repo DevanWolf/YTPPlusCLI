@@ -1,17 +1,15 @@
 if(!process.cwd().includes("YTPPlusCLI")) {
 	process.chdir("YTPPlusCLI");
 }
-const clear = require('clear'),
-	figlet = require('figlet'),
+const figlet = require('figlet'),
 	prompts = require("./prompts"),
 	fs = require('fs'),
 	package = JSON.parse(fs.readFileSync("./package.json")),
 	argv = require('minimist')(process.argv.slice(2)),
-	generator = require("./generator");
-clear(); //clear screen
-console.log(
-	figlet.textSync('ytp+ cli', { horizontalLayout: 'full' }) + "\n" + package.homepage + "\nThis software is licensed under the GNU General Public License Version 3.0."
-);
+	generator = require("./generator"),
+	version = fs.readFileSync("version.txt");
+if(!argv.silent)
+	console.log(figlet.textSync('ytp+ cli', { horizontalLayout: 'full' }) + "\n" + package.homepage + " v" + version + "\nThis software is licensed under the GNU General Public License Version 3.0.");
 //errors and warnings
 let plugins
 if(!fs.existsSync(process.cwd()+"/plugins")) {
@@ -25,6 +23,8 @@ if(!fs.existsSync(process.cwd()+"/shared/temp")) {
 	fs.mkdirSync(process.cwd()+"/shared/temp");
 }
 const run = async () => {
+	if(argv.silent)
+		argv.skip = true;
 	if(argv.skip != null) {
 		return argv; //skip prompts
 	} else {
@@ -48,7 +48,8 @@ run().then((results) => {
 	} else {
 		plugins = ""
 	}
-	console.log("Plugins:\n--------\n"+plugins+"\n--------")
+	if(!argv.silent)
+		console.log("Plugins:\n--------\n"+plugins+"\n--------")
 	results.plugins = plugins.split("\n")
 	generator(results);
 })

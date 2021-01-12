@@ -95,7 +95,7 @@ module.exports = {
       {
         name: 'usetransitions',
         type: 'confirm',
-        default: argv.usetransitions || true,
+        default: argv.usetransitions || false,
         message: 'Use transition clips at random?'
       }
     ];

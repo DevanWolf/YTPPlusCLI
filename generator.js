@@ -5,19 +5,25 @@ const fs = require("fs"),
 	cliProgress = require('cli-progress');
 
 function go(toolbox) {
-	const inputfiles = fs.readFileSync(toolbox.input).toString().split("\n");
-	// create a new progress bar instance and use shades_classic theme
-	const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-	// start the progress bar with a total value of 200 and start value of 0
-	bar.start(toolbox.clips, 0);
-	if (inputfiles.length <= 0) {
-		console.log("No sources added...");
-		return;
-	}
-	if (fs.existsSync(toolbox.output)) {
-		fs.unlinkSync(toolbox.output);
-	}
 	try {
+		let inputfiles;
+		if(toolbox.input != undefined || toolbox.input != null)
+			inputfiles = fs.readFileSync(toolbox.input).toString().split("\n");
+		else inputfiles = "";
+		if(!toolbox.silent) {
+			// create a new progress bar instance and use shades_classic theme
+			const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+			// start the progress bar with a total value of 200 and start value of 0
+			bar.start(toolbox.clips, 0);
+		}
+		if (inputfiles.length <= 0) {
+			if(!toolbox.silent)
+				console.log("\nNo sources added...");
+			return process.exit(0);
+		}
+		if (fs.existsSync(toolbox.output)) {
+			fs.unlinkSync(toolbox.output);
+		}
 		cleanUp(toolbox.clips, toolbox.cleanUp);
 		for (var i = 0; i < toolbox.clips; i++) {
 			var sourceToPick = inputfiles[randomInt(0, inputfiles.length)];
@@ -27,15 +33,15 @@ function go(toolbox) {
 			var endOfClip = startOfClip + randomvar(toolbox.minstream, toolbox.maxstream);
 			if(toolbox.debug)
 			{
-				console.log("Source: "+sourceToPick);
-				console.log("Length: "+length);
-				console.log("STARTING CLIP " + "video" + i);
-				console.log("Beginning of clip " + i + ": " + startOfClip);
-				console.log("Ending of clip " + i + ": " + endOfClip + ", in seconds: ");
+				console.log("\nSource: "+sourceToPick);
+				console.log("\nLength: "+length);
+				console.log("\nSTARTING CLIP " + "video" + i);
+				console.log("\nBeginning of clip " + i + ": " + startOfClip);
+				console.log("\nEnding of clip " + i + ": " + endOfClip + ", in seconds: ");
 			}
 			if (randomInt(0, 15) == 15 && toolbox.usetransitions==true) {
 				if(toolbox.debug)
-					console.log("Tryina use a diff source");
+					console.log("\nTryina use a diff source");
 				global.copyVideo(pickSource(toolbox.transitions), process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
 			} else {
 				global.snipVideo(sourceToPick, startOfClip, endOfClip, process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
@@ -46,20 +52,25 @@ function go(toolbox) {
 				if(toolbox.plugins[int] != "") {
 					var effect = toolbox.plugins[int];
 					if(toolbox.debug)
-						console.log("STARTING EFFECT ON CLIP " + i + " EFFECT " + effect);
+						console.log("\nSTARTING EFFECT ON CLIP " + i + " EFFECT " + effect);
 					var clipToWorkWith = process.cwd()+"/shared/temp/video" + i + ".mp4";
 					plugins[effect].plugin(clipToWorkWith, toolbox, process.cwd(), toolbox.debug);
 				}
 			}
-			bar.increment();
+			if(!toolbox.silent)
+				bar.increment();
 		}
 		global.concatenateVideo(toolbox.clips, toolbox.output, toolbox.debug);
 	} catch (ex) {
 		process.stdin.resume();
-		console.log("An error has occured.")
-		return console.log(ex);
+		if(!toolbox.silent) {
+			console.log("\nAn error has occured.")
+			console.log("\n"+ex)
+		}
+		return process.exit(0);
 	}
-	bar.update(100);
+	if(!toolbox.silent)
+		bar.update(100);
 	cleanUp(toolbox.clips);
 	fs.rmdirSync(process.cwd()+"/shared/temp/");
 	process.exit(0);
