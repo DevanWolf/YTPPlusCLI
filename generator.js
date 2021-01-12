@@ -5,17 +5,14 @@ const fs = require("fs"),
 	cliProgress = require('cli-progress');
 
 function go(toolbox) {
+	const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 	try {
+		if(!toolbox.silent)
+			bar.start(toolbox.clips, 0);
 		let inputfiles;
 		if(toolbox.input != undefined || toolbox.input != null)
 			inputfiles = fs.readFileSync(toolbox.input).toString().split("\n");
 		else inputfiles = "";
-		if(!toolbox.silent) {
-			// create a new progress bar instance and use shades_classic theme
-			const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-			// start the progress bar with a total value of 200 and start value of 0
-			bar.start(toolbox.clips, 0);
-		}
 		if (inputfiles.length <= 0) {
 			if(!toolbox.silent)
 				console.log("\nNo sources added...");

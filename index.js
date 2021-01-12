@@ -43,13 +43,9 @@ run().then((results) => {
 	} else {
 		results.debug = false
 	}
-	if(results.enabledplugins != null && results.enabledplugins != undefined && results.enabledplugins != "") {
-		plugins = fs.readFileSync(results.enabledplugins).toString()
-	} else {
-		plugins = ""
-	}
+	plugins = fs.readdirSync("plugins")
 	if(!argv.silent)
 		console.log("Plugins:\n--------\n"+plugins+"\n--------")
-	results.plugins = plugins.split("\n")
+	results.plugins = plugins
 	generator(results);
 })

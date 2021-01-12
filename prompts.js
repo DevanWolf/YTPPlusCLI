@@ -6,23 +6,6 @@ module.exports = {
   askYTP: (argv) => {
     const questions = [
       {
-        name: 'enabledplugins',
-        type: 'input',
-        message: 'Enter the enabled plugins *.txt file location:',
-        default: argv.input || "enabledplugins.txt",
-        validate: function( value ) {
-          if (value.length) {
-            if(fs.existsSync(value)) {
-              return true;
-            } else {
-              return 'The specified file does not exist, please enter a valid file.';
-            }
-          } else {
-            return 'Please enter the enabled plugins *.txt file location. It would contain the names of plugins with js extensions separated by newlines.';
-          }
-        }
-      },
-      {
         name: 'input',
         type: 'input',
         message: 'Enter the input *.txt file location:',
