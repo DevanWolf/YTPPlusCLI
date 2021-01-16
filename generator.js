@@ -1,4 +1,4 @@
-
+/* Includes */
 const fs = require("fs"),
 	global = require("./global"),
 	plugins = require("./plugins"),
@@ -8,27 +8,28 @@ function go(toolbox) {
 	const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 	try {
 		if(!toolbox.silent)
-			bar.start(toolbox.clips, 0);
+			bar.start(toolbox.clips, 0); //We don't want a progress bar if we're silently running
+		/* Input handling */
 		let inputfiles;
-		if(toolbox.input != undefined || toolbox.input != null)
-			inputfiles = fs.readFileSync(toolbox.input).toString().split("\n");
-		else inputfiles = "";
+		if(toolbox.input)
+			inputfiles = fs.readFileSync(toolbox.input, {encoding:"utf-8"}).toString().split("\n"); //Input is a text file as specified by command line
+		else
+			inputfiles = ""; //This will only happen if the input text file is empty
 		if (inputfiles.length <= 0) {
 			if(!toolbox.silent)
 				console.log("\nNo sources added...");
-			return process.exit(0);
+			return process.exit(1);
 		}
-		if (fs.existsSync(toolbox.output)) {
-			fs.unlinkSync(toolbox.output);
-		}
-		cleanUp(toolbox.clips, toolbox.cleanUp);
+		if (fs.existsSync(toolbox.output))
+			fs.unlinkSync(toolbox.output); //Delete the output file so we can replace it without issue
+		cleanUp(toolbox.clips, toolbox.cleanUp); //Remove old working files and directories
 		for (var i = 0; i < toolbox.clips; i++) {
-			var sourceToPick = inputfiles[randomInt(0, inputfiles.length)];
+			var sourceToPick = inputfiles[global.randomInt(0, inputfiles.length)];
 			var data = global.getVideoProbe(sourceToPick);
 			var length = data.duration;
 			var startOfClip = randomvar(0, length - toolbox.maxstream);
 			var endOfClip = startOfClip + randomvar(toolbox.minstream, toolbox.maxstream);
-			if(toolbox.debug)
+			if(toolbox.debug) //Copied from YTP+ for redundancy
 			{
 				console.log("\nSource: "+sourceToPick);
 				console.log("\nLength: "+length);
@@ -36,7 +37,7 @@ function go(toolbox) {
 				console.log("\nBeginning of clip " + i + ": " + startOfClip);
 				console.log("\nEnding of clip " + i + ": " + endOfClip + ", in seconds: ");
 			}
-			if (randomInt(0, 15) == 15 && toolbox.usetransitions==true) {
+			if (global.randomInt(0, 15) == 15 && toolbox.usetransitions==true) {
 				if(toolbox.debug)
 					console.log("\nTryina use a diff source");
 				global.copyVideo(pickSource(toolbox.transitions), process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
@@ -44,7 +45,7 @@ function go(toolbox) {
 				global.snipVideo(sourceToPick, startOfClip, endOfClip, process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
 			}
 			//Add a random effect to the video
-			var int = randomInt(0, toolbox.plugins.length+5);
+			var int = (toolbox.plugintest ? 0 : global.randomInt(0, toolbox.plugins.length+5));
 			if(int < toolbox.plugins.length && toolbox.plugins.length != 0) {
 				if(toolbox.plugins[int] != "") {
 					var effect = toolbox.plugins[int];
@@ -64,13 +65,13 @@ function go(toolbox) {
 			console.log("\nAn error has occured.")
 			console.log("\n"+ex)
 		}
-		return process.exit(0);
+		return process.exit(1);
 	}
 	if(!toolbox.silent)
-		bar.update(100);
+		bar.update(toolbox.clips);
 	cleanUp(toolbox.clips);
 	fs.rmdirSync(process.cwd()+"/shared/temp/");
-	process.exit(0);
+	process.exit(0); //All done here
 }
 
 function randomvar(min, max) {
@@ -80,10 +81,6 @@ function randomvar(min, max) {
 		finalVal=Math.round(x * 100.0) / 100.0; 
 	}
 	return finalVal;
-}
-
-function randomInt(min, max) {
-	return Math.floor(Math.random() * (max - min) + min);
 }
 
 
