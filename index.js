@@ -13,14 +13,17 @@ const figlet = require('figlet'),
 	version = fs.readFileSync("version.txt", {encoding:"utf-8"}),
 	plugins = (argv.plugintest ? [argv.plugintest] : (argv.plugins ? fs.readFileSync(argv.plugins, {encoding:"utf-8"}).split("\r\n") : fs.readdirSync("plugins"))),
 	global = require("./global");
-/* Plugin reciever for ytp+ studio */
+/* Single-use parameters */
 if(argv.getplugins) {
 	if(argv.pluginoutput) {
-		fs.writeFileSync(argv.pluginoutput,plugins.join("\n"))
+		fs.writeFileSync(argv.pluginoutput,plugins.join("\n"));
 	} else {
 		console.log(plugins.join("\n"));
 	}
-	process.exit(0)
+	process.exit(0);
+} else if(argv.version) {
+	console.log(version);
+	process.exit(0);
 }
 /* Title */
 if(!argv.silent)
