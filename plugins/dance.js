@@ -12,8 +12,8 @@ module.exports = {
 		
 		// final result is backwards & forwards concatenated with music
 		
-		if (fs.existsSync(input))
-			fs.renameSync(input,temp);
+		if (fs.existsSync(temp))
+			fs.unlinkSync(temp);
 		if (fs.existsSync(temp2))
 			fs.unlinkSync(temp2);
 		if (fs.existsSync(temp3))
@@ -25,6 +25,9 @@ module.exports = {
 		if (fs.existsSync(temp6))
 			fs.unlinkSync(temp6);
 		
+		if (fs.existsSync(input))
+			fs.renameSync(input,temp);
+
 		var soundDir = cwd + "/shared/music";
 
 		if (!fs.existsSync(soundDir))
