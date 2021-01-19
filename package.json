@@ -32,7 +32,7 @@
     "minimist": "^1.2.5"
   },
   "engines": {
-    "node": ">=13.0.0"
+    "node": ">=v4.9.1"
   },
   "bin": {
     "ytpplus": "cli.js"
