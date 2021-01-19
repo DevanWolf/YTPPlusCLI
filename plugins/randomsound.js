@@ -9,7 +9,7 @@ module.exports = {
 			fs.mkdirSync(soundDir) //init plugin
 
 		var readDir = fs.readdirSync(soundDir),
-			randomSound = readDir[global.randomInt(0,readDir.length)];
+			randomSound = readDir[global.randomInt(0,readDir.length-1)];
 
 		if(!randomSound) {
 			if(debug) console.log("\nNo sounds exist in directory '"+soundDir+"'!")

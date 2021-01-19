@@ -24,7 +24,7 @@ function go(toolbox) {
 			fs.unlinkSync(toolbox.output); //Delete the output file so we can replace it without issue
 		cleanUp(toolbox.clips, toolbox.cleanUp); //Remove old working files and directories
 		for (var i = 0; i < toolbox.clips; i++) {
-			var sourceToPick = inputfiles[global.randomInt(0, inputfiles.length)];
+			var sourceToPick = inputfiles[global.randomInt(0, inputfiles.length-1)];
 			var data = global.getVideoProbe(sourceToPick);
 			var length = data.duration;
 			var startOfClip = randomvar(0, length - toolbox.maxstream);

@@ -105,20 +105,32 @@ module.exports = {
         This should NOT be used in plugins */
     concatenateVideo: (count, out, debug) => {
         var command1 = "";
+            
         for (var i=0; i<count; i++) {
             if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
-                let newline = ""
-                if(command1 != "") {
-                    newline = "\n"
-                }
-                command1 = command1.concat(newline+"file '" + process.cwd()+"/shared/temp/video" + i + ".mp4'"); 
+                command1 = command1.concat(" -i "+process.cwd()+"/shared/temp/video" + i + ".mp4");
             }
         }
-        fs.writeFileSync("concat.txt",`${command1.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : /\//g))}`)
-        return ffmpeg.runSync("-f concat -safe 0 -i concat.txt -af aresample=async=1 "+out + (debug == false ? " -hide_banner -loglevel quiet" : ""));
+        command1 = command1.concat(" -filter_complex \"");
+        
+        let realcount = 0;
+
+        for (var i=0; i<count; i++) {
+            if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
+                realcount+=1;
+            }
+        }
+
+        for (var i=0; i<realcount; i++) {
+            command1 = command1.concat("[" + i + ":v:0][" + i + ":a:0]");
+        }
+
+        command1=command1.concat("concat=n=" + realcount + ":v=1:a=1[outv][outa]\" -map \"[outv]\" -map \"[outa]\" -y " + out); 
+
+        return ffmpeg.runSync(command1 + (debug == false ? " -hide_banner -loglevel quiet" : ""));
     },
     /* Get a random integer between a minimum and a maximum number */
     randomInt: (min, max) => {
-        return Math.floor(Math.random() * (max - min) + min);
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 }

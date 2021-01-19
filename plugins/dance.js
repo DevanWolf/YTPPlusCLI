@@ -34,7 +34,7 @@ module.exports = {
 			fs.mkdirSync(soundDir) //init plugin
 
 		var readDir = fs.readdirSync(soundDir),
-			randomSound = readDir[global.randomInt(0,readDir.length)],
+			randomSound = readDir[global.randomInt(0,readDir.length-1)],
 			randomTime = global.randomInt(3,9),
 			randomTime2 = global.randomInt(0,1);
 
