@@ -1,2 +1,0 @@
-randomsound.js
-dance.js
