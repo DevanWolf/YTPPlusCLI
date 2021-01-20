@@ -110,3 +110,5 @@ videos.txt
 *.mp4
 concat.txt
 plugins.txt
+
+package-lock.json
