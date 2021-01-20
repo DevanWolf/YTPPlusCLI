@@ -1,3 +1,4 @@
+"use strict";
 /* Change directory to YTPPlusCLI if we're not in it already */
 const argv = require('minimist')(process.argv.slice(2)), //Used elsewhere too
 	cwd = (argv.cwd ? argv.cwd : process.cwd());
@@ -5,9 +6,8 @@ if(!cwd.includes("YTPPlusCLI")) {
 	process.chdir(cwd + "/YTPPlusCLI");
 }
 /* Includes */
-const figlet = require('figlet'),
-	fs = require('fs'),
-	package = JSON.parse(fs.readFileSync("./package.json", {encoding:"utf-8"})),
+const fs = require('fs'),
+	pkg = JSON.parse(fs.readFileSync("./package.json", {encoding:"utf-8"})),
 	generator = require("./generator"),
 	version = fs.readFileSync("version.txt", {encoding:"utf-8"}),
 	plugins = (argv.plugintest ? [argv.plugintest] : (argv.plugins ? fs.readFileSync(argv.plugins, {encoding:"utf-8"}).split("\r\n") : fs.readdirSync("plugins"))),
@@ -26,7 +26,7 @@ if(argv.getplugins) {
 }
 /* Title */
 if(!argv.silent)
-	console.log(figlet.textSync('ytp+ cli', { horizontalLayout: 'full' }) + "\n" + package.homepage + " v" + version + "\nThis software is licensed under the GNU General Public License Version 3.0.");
+	console.log("ytp+ cli\n" + pkg.homepage + " v" + version + "\nThis software is licensed under the GNU General Public License Version 3.0.");
 /* Errors and warnings */
 if(!fs.existsSync(process.cwd()+"/shared")) {
 	console.log("No shared directory found!\nThe 'shared' directory has been created in "+process.cwd());

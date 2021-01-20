@@ -24,7 +24,8 @@
   "homepage": "https://github.com/YTP-Plus/YTPPlusCLI",
   "dependencies": {
     "ffmpeg-cli": "YTP-Plus/ffmpeg-cli#windows-xp",
-    "mediainfo-static": "^1.0.5"
+    "mediainfo-static": "^1.0.5",
+    "minimist": "^1.2.5"
   },
   "engines": {
     "node": ">=v4.9.1"
