@@ -1,14 +1,10 @@
 /* Includes */
 const fs = require("fs"),
 	global = require("./global"),
-	plugins = require("./plugins"),
-	cliProgress = require('cli-progress');
+	plugins = require("./plugins");
 
 function go(toolbox) {
-	const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 	try {
-		if(!toolbox.silent)
-			bar.start(toolbox.clips, 0); //We don't want a progress bar if we're silently running
 		/* Input handling */
 		let inputfiles;
 		if(toolbox.input)
@@ -55,8 +51,6 @@ function go(toolbox) {
 					plugins[effect].plugin(clipToWorkWith, toolbox, process.cwd(), toolbox.debug);
 				}
 			}
-			if(!toolbox.silent)
-				bar.increment();
 		}
 		global.concatenateVideo(toolbox.clips, toolbox.output, toolbox.debug);
 	} catch (ex) {
@@ -67,8 +61,6 @@ function go(toolbox) {
 		}
 		return process.exit(1);
 	}
-	if(!toolbox.silent)
-		bar.update(toolbox.clips);
 	cleanUp(toolbox.clips);
 	fs.rmdirSync(process.cwd()+"/shared/temp/");
 	process.exit(0); //All done here

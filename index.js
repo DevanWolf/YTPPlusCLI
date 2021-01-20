@@ -6,7 +6,6 @@ if(!cwd.includes("YTPPlusCLI")) {
 }
 /* Includes */
 const figlet = require('figlet'),
-	prompts = require("./prompts"),
 	fs = require('fs'),
 	package = JSON.parse(fs.readFileSync("./package.json", {encoding:"utf-8"})),
 	generator = require("./generator"),
@@ -37,26 +36,16 @@ if(!fs.existsSync(process.cwd()+"/shared/temp")) {
 	fs.mkdirSync(process.cwd()+"/shared/temp");
 }
 /* Prompts */
-const run = async () => {
+async function run() {
 	if(argv.silent) {
-		argv.skip = true;
 		argv.debug = false
 	}
-	if(argv.skip) {
-		/* Merge defaults */
-		var results = global.defaults;
-		let key;
-		for(key in argv)
-			results[key] = argv[key];
-		return results;
-	} else {
-		var results = await prompts.askYTP(argv);
-		if(results.usetransitions == true) {
-			var results2 = await prompts.askTransitions(argv);
-			results.transitions = results2.transitions; //merging
-		}
-		return results;
-	}
+	/* Merge defaults */
+	var results = global.defaults;
+	let key;
+	for(key in argv)
+		results[key] = argv[key];
+	return results;
 };
 /* Launch generator.js */
 run().then((results) => {
@@ -67,7 +56,7 @@ run().then((results) => {
 		results.debug = false
 	}
 	if(!argv.silent)
-		console.log("Plugins:\n--------\n"+plugins.join("\n")+"\n--------")
+		console.log("Plugins:\n--------\n"+plugins.join("\n")+"\n--------\nStarting generation, progress cannot be shown due to the current branch.")
 	results.plugins = plugins
 	results.plugintest = argv.plugintest
 	generator(results);
