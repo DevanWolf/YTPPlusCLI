@@ -35,29 +35,25 @@ if(!fs.existsSync(process.cwd()+"/shared")) {
 if(!fs.existsSync(process.cwd()+"/shared/temp")) {
 	fs.mkdirSync(process.cwd()+"/shared/temp");
 }
-/* Prompts */
-async function run() {
-	if(argv.silent) {
-		argv.debug = false
-	}
-	/* Merge defaults */
-	var results = global.defaults;
-	let key;
-	for(key in argv)
-		results[key] = argv[key];
-	return results;
-};
 /* Launch generator.js */
-run().then((results) => {
-	if(argv.debug) {
-		results.debug = argv.debug
-		console.log(results)
-	} else {
-		results.debug = false
-	}
-	if(!argv.silent)
-		console.log("Plugins:\n--------\n"+plugins.join("\n")+"\n--------\nStarting generation, progress cannot be shown due to the current branch.")
-	results.plugins = plugins
-	results.plugintest = argv.plugintest
-	generator(results);
-})
+if(argv.silent) {
+	argv.debug = false
+}
+/* Merge defaults */
+var results = global.defaults;
+let key;
+for(key in argv)
+	results[key] = argv[key]; //merge
+
+if(argv.debug) {
+	results.debug = argv.debug
+	console.log(results)
+} else {
+	results.debug = false
+}
+
+if(!argv.silent)
+	console.log("Plugins:\n--------\n"+plugins.join("\n")+"\n--------\nStarting generation, progress cannot be shown due to the current branch.")
+results.plugins = plugins
+results.plugintest = argv.plugintest
+generator(results);
