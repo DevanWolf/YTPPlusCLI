@@ -1,3 +1,4 @@
+"use strict";
 /* Includes */
 const fs = require("fs"),
 	global = require("./global"),

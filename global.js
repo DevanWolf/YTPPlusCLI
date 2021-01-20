@@ -1,7 +1,8 @@
+"use strict";
 //unused right now
 const fs = require("fs"),
     ffmpeg = require("ffmpeg-cli"),
-    { execSync } = require('child_process'),
+    child_process = require('child_process'),
     mediainfo = require('mediainfo-static');
 module.exports = {
     /* Prompt Defaults */
@@ -25,11 +26,10 @@ module.exports = {
         //Taken from https://www.npmjs.com/package/video-length
         //Not using package due to invalid params with mediainfo-static
         let vid = `"${video.replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}"`;
-        let stdout = execSync(mediainfo.path+" "+vid+' --full --output=JSON');
+        let stdout = child_process.execSync(mediainfo.path+" "+vid+' --full --output=JSON');
         if(stdout) {
             let specs = JSON.parse(stdout.toString());
-            let { track } = specs.media;
-            if(!track){
+            if(!specs.media.track){
                 throw new TypeError('Can\'t extract video specs');
             }
             // General info
@@ -42,15 +42,13 @@ module.exports = {
             if(!video_specs){
                 throw new TypeError('Can\'t find "Video" track');
             }
-            let { Duration, FrameRate, OverallBitRate, FileSize } = general_specs;
-            let { Width, Height } = video_specs;
             return {
-                duration : parseFloat(Duration),
-                width    : parseFloat(Width),
-                height   : parseFloat(Height),
-                fps      : parseFloat(FrameRate),
-                bitrate  : parseFloat(OverallBitRate),
-                size     : parseFloat(FileSize),
+                duration : parseFloat(general_specs.Duration),
+                width    : parseFloat(video_specs.Width),
+                height   : parseFloat(video_specs.Height),
+                fps      : parseFloat(general_specs.FrameRate),
+                bitrate  : parseFloat(general_specs.OverallBitRate),
+                size     : parseFloat(general_specs.FileSize),
             };
         }
     },
@@ -59,11 +57,10 @@ module.exports = {
         //Taken from https://www.npmjs.com/package/video-length
         //Modified
         let vid = `"${video.replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}"`;
-        let stdout = execSync(mediainfo.path+" "+vid+' --full --output=JSON');
+        let stdout = child_process.execSync(mediainfo.path+" "+vid+' --full --output=JSON');
         if(stdout) {
             let specs = JSON.parse(stdout.toString());
-            let { track } = specs.media;
-            if(!track){
+            if(!specs.media.track){
                 throw new TypeError('Can\'t extract audio specs');
             }
             // General info
@@ -71,11 +68,10 @@ module.exports = {
             if(!general_specs){
                 throw new TypeError('Can\'t find "General" specs');
             }
-            let { Duration, OverallBitRate, FileSize } = general_specs;
             return {
-                duration : parseFloat(Duration),
-                bitrate  : parseFloat(OverallBitRate),
-                size     : parseFloat(FileSize),
+                duration : parseFloat(general_specs.Duration),
+                bitrate  : parseFloat(general_specs.OverallBitRate),
+                size     : parseFloat(general_specs.FileSize),
             };
         }
     },
