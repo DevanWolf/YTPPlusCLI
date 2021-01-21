@@ -88,7 +88,7 @@ module.exports = {
             + " -ar 44100"
             + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
             + " -y"
-            + " " + output + ".mp4";
+            + " \"" + output + ".mp4\"";
         return ffmpeg.runSync(args + (debug == false ? " -hide_banner -loglevel quiet" : ""));
     },
     /* Copies videos to what is normally the temporary directory */
@@ -98,7 +98,7 @@ module.exports = {
             + " -ac 1"
             + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
             + " -y"
-            + " " + output + ".mp4";
+            + " \"" + output + ".mp4\"";
         return ffmpeg.runSync(args + (debug == false ? " -hide_banner -loglevel quiet" : ""));
     },
     /* Writes a concat.txt and merges it together, this is unlike the original YTP+ as it now allows for any amount of video files
@@ -108,7 +108,7 @@ module.exports = {
             
         for (var i=0; i<count; i++) {
             if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
-                command1 = command1.concat(" -i "+process.cwd()+"/shared/temp/video" + i + ".mp4");
+                command1 = command1.concat(" -i \""+process.cwd()+"/shared/temp/video" + i + ".mp4\"");
             }
         }
         command1 = command1.concat(" -filter_complex \"");
@@ -125,7 +125,7 @@ module.exports = {
             command1 = command1.concat("[" + i + ":v:0][" + i + ":a:0]");
         }
 
-        command1=command1.concat("concat=n=" + realcount + ":v=1:a=1[outv][outa]\" -map \"[outv]\" -map \"[outa]\" -y " + out); 
+        command1=command1.concat("concat=n=" + realcount + ":v=1:a=1[outv][outa]\" -map \"[outv]\" -map \"[outa]\" -y \"" + out + "\""); 
 
         return ffmpeg.runSync(command1 + (debug == false ? " -hide_banner -loglevel quiet" : ""));
     },

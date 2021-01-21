@@ -45,45 +45,45 @@ module.exports = {
 
 		let commands = [];
 
-		commands.push("-i " + temp + " -map 0"// -c:v copy"
+		commands.push("-i \"" + temp + "\" -map 0"// -c:v copy"
 				+ " -ar 44100"
 				+ " -to 00:00:0"+randomTime2+"." + randomTime
 				+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1"
 				+ " -an"
-				+ " -y " + temp2);
+				+ " -y \"" + temp2 + "\"");
 		
-		commands.push("-i " + temp2 + " -map 0"// -c:v copy"
+		commands.push("-i \"" + temp2 + "\" -map 0"// -c:v copy"
 				+ " -ar 44100"
 				+ " -vf reverse,scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1"
-				+ " -y " + temp3);
+				+ " -y \"" + temp3 + "\"");
 		
-		commands.push("-i " + temp3
+		commands.push("-i \"" + temp3 + "\""
 				+ " -ar 44100"
 				+ " -vf reverse,scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1"
-				+ " -y " + temp4);
+				+ " -y \"" + temp4 + "\"");
 		
-		commands.push("-i " + temp3
+		commands.push("-i \"" + temp3 + "\""
 				+ " -i " + temp4
 				+ " -filter_complex \"[0:v:0][1:v:0][0:v:0][1:v:0][0:v:0][1:v:0][0:v:0][1:v:0]concat=n=8:v=1[outv]\""
 				+ " -map \"[outv]\""
 				+ " -c:v libx264 -shortest"
-				+ " -y " + temp5);
+				+ " -y \"" + temp5 + "\"");
 		
-		commands.push("-i " + temp5
+		commands.push("-i \"" + temp5 + "\""
 				+ " -map 0"
 				+ " -ar 44100"
 				+ " -vf \"setpts=0.5*PTS,scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1\""
 				+ " -af \"atempo=2.0\""
 				+ " -shortest"
-				+ " -y " + temp6);
+				+ " -y \"" + temp6 + "\"");
 		
-		commands.push("-i " + temp6
-				+ " -i " + soundDir + "/" + randomSound
+		commands.push("-i \"" + temp6 + "\""
+				+ " -i \"" + soundDir + "/" + randomSound + "\""
 				+ " -c:v libx264"
 				+ " -map 0:v:0 -map 1:a:0"
 				+ " -vf \"scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps+"\""
 				+ " -shortest"
-				+ " -y " + video);
+				+ " -y \"" + video + "\"");
 		
 		for (var i = 0; i < commands.length; i++) {
 			global.ffmpeg.runSync(commands[i] + (debug == false ? " -hide_banner -loglevel quiet" : ""));

@@ -26,16 +26,16 @@ module.exports = {
 		if (fs.existsSync(video))
 			fs.renameSync(video,temp);
 
-		var command = "-i " + temp
+		var command = "-i \"" + temp + "\""
 			+ " -ar 44100"
 			+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps
-			+ " -af \"volume=0\" -y " + temp2;
+			+ " -af \"volume=0\" -y \"" + temp2 + "\"";
 		var command2 = "-i " + temp2
 			+ " -i \"" +soundDir + "/" +randomSound+"\""
 			+ " -to "+soundLength
 			+ " -ar 44100"
 			+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps
-			+ " -filter_complex \"[1:a]volume=1,apad[A]; [0:a][A]amerge[out]\" -ac 2 -map 0:v -map [out] -y " + video;
+			+ " -filter_complex \"[1:a]volume=1,apad[A]; [0:a][A]amerge[out]\" -ac 2 -map 0:v -map [out] -y \"" + video + "\"";
 		global.ffmpeg.runSync(command + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		global.ffmpeg.runSync(command2 + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		fs.unlinkSync(temp);

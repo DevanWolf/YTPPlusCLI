@@ -6,6 +6,7 @@ const fs = require("fs"),
 
 function go(toolbox) {
 	const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+	if(toolbox.sequential) var sequential = -1; //start on -1 as it will be incremented
 	try {
 		if(!toolbox.silent)
 			bar.start(toolbox.clips, 0); //We don't want a progress bar if we're silently running
@@ -45,7 +46,13 @@ function go(toolbox) {
 				global.snipVideo(sourceToPick, startOfClip, endOfClip, process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
 			}
 			//Add a random effect to the video
-			var int = (toolbox.plugintest ? 0 : global.randomInt(0, toolbox.plugins.length+5));
+			let int;
+			if(toolbox.sequential) {
+				if(sequential == toolbox.plugins.length) sequential = -1; //prepare for addition below
+				sequential++;
+				int = sequential;
+			} else
+				int = (toolbox.plugintest ? 0 : global.randomInt(0, toolbox.plugins.length+5));
 			if(int < toolbox.plugins.length && toolbox.plugins.length != 0) {
 				if(toolbox.plugins[int] != "") {
 					var effect = toolbox.plugins[int];
@@ -77,7 +84,7 @@ function go(toolbox) {
 function randomvar(min, max) {
 	var finalVal = -1;
 	while (finalVal<0) {
-		var x = (Math.random() * ((max - min) + 0)) + min;
+		var x = (Math.random() * ((max - min))) + min;
 		finalVal=Math.round(x * 100.0) / 100.0; 
 	}
 	return finalVal;

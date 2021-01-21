@@ -12,14 +12,14 @@ module.exports = {
 		if (fs.existsSync(video))
 			fs.renameSync(video,temp);
 
-		var command = "-i " + temp
+		var command = "-i \"" + temp + "\""
 			+ " -ar 44100"
 			+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps
-			+ " -af \"areverse\" -y " + temp2;
+			+ " -af \"areverse\" -y \"" + temp2 + "\"";
 		var command2 = "-i " + temp2
 			+ " -ar 44100"
 			+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps
-			+ " -vf reverse -y " + video;
+			+ " -vf reverse -y \"" + video + "\"";
 		global.ffmpeg.runSync(command + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		global.ffmpeg.runSync(command2 + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		fs.unlinkSync(temp);
