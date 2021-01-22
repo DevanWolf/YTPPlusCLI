@@ -41,7 +41,8 @@ function go(toolbox) {
 			if (global.randomInt(0, 15) == 15 && toolbox.usetransitions==true) {
 				if(toolbox.debug)
 					console.log("\nTryina use a diff source");
-				global.copyVideo(pickSource(toolbox.transitions), process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
+				var transitions = fs.readFileSync(toolbox.transitions, {encoding:"utf-8"});
+				global.copyVideo(pickSource(transitions.split("\n")), process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
 			} else {
 				global.snipVideo(sourceToPick, startOfClip, endOfClip, process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
 			}
