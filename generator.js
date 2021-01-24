@@ -2,29 +2,54 @@
 const fs = require("fs"),
 	global = require("./global"),
 	plugins = require("./plugins"),
-	cliProgress = require('cli-progress');
+	cliProgress = require('cli-progress'),
+	child_process = require("child_process");
 
-function go(toolbox) {
+async function go(toolbox)
+{
+	let counter = 0;
+	let ffmpeg;
 	const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-	if(toolbox.sequential) var sequential = -1; //start on -1 as it will be incremented
-	try {
-		if(!toolbox.silent)
-			bar.start(toolbox.clips, 0); //We don't want a progress bar if we're silently running
-		/* Input handling */
-		let inputfiles;
-		if(toolbox.input)
-			inputfiles = fs.readFileSync(toolbox.input, {encoding:"utf-8"}).toString().split("\n"); //Input is a text file as specified by command line
-		else
-			inputfiles = ""; //This will only happen if the input text file is empty
-		if (inputfiles.length <= 0) {
-			if(!toolbox.silent)
-				console.log("\nNo sources added...");
-			return process.exit(1);
+	bar.start(toolbox.clips-1, 0);
+	while(true) {
+		suppressUnhandledRejections(startgeneration(toolbox, counter));
+		bar.update(counter);
+		if(counter >= toolbox.clips-1) {
+			counter = -1;
+			process.chdir(process.cwd()+"/shared/temp");
+			for(var i = 0; i <= toolbox.clips-1; i++) {
+				global.ffmpeg.runSync("-i video"+i+".mp4 -vcodec libx264 -preset ultrafast -acodec libmp3lame -ac 2 -f avi -y ivideo"+i+".avi"+(toolbox.debug ? "" : " -hide_banner -loglevel quiet"));
+			}
+			if(ffmpeg != undefined) child_process.execSync("START /wait taskkill /IM \"ffmpeg.exe\" /F");
+			ffmpeg = global.ffmpeg.run("-re -fflags +igndts -i concat.txt -c copy -ac 2 -f flv "+toolbox.rtmpurl+(toolbox.debug ? "" : " -hide_banner -loglevel quiet"));
+			process.chdir(process.cwd()+"/../..");
 		}
-		if (fs.existsSync(toolbox.output))
-			fs.unlinkSync(toolbox.output); //Delete the output file so we can replace it without issue
-		cleanUp(toolbox.clips, toolbox.cleanUp); //Remove old working files and directories
-		for (var i = 0; i < toolbox.clips; i++) {
+		counter++;
+	}
+}
+
+function suppressUnhandledRejections(p) {
+	p.catch(() => {});
+	return p;
+}	
+
+function startgeneration(toolbox, counter) {
+	return new Promise((resolve, reject) => {
+		if(toolbox.sequential) var sequential = -1; //start on -1 as it will be incremented
+		try {
+			/* Input handling */
+			let inputfiles;
+			if(toolbox.input)
+				inputfiles = fs.readFileSync(toolbox.input, {encoding:"utf-8"}).toString().split("\n"); //Input is a text file as specified by command line
+			else
+				inputfiles = ""; //This will only happen if the input text file is empty
+			if (inputfiles.length <= 0) {
+				if(!toolbox.silent)
+					console.log("\nNo sources added...");
+				return process.exit(1);
+			}
+			if (fs.existsSync(toolbox.output))
+				fs.unlinkSync(toolbox.output); //Delete the output file so we can replace it without issue
 			var sourceToPick = inputfiles[global.randomInt(0, inputfiles.length-1)];
 			var data = global.getVideoProbe(sourceToPick);
 			var length = data.duration;
@@ -34,17 +59,14 @@ function go(toolbox) {
 			{
 				console.log("\nSource: "+sourceToPick);
 				console.log("\nLength: "+length);
-				console.log("\nSTARTING CLIP " + "video" + i);
-				console.log("\nBeginning of clip " + i + ": " + startOfClip);
-				console.log("\nEnding of clip " + i + ": " + endOfClip + ", in seconds: ");
 			}
 			if (global.randomInt(0, 15) == 15 && toolbox.usetransitions==true) {
 				if(toolbox.debug)
 					console.log("\nTryina use a diff source");
 				var transitions = fs.readFileSync(toolbox.transitions, {encoding:"utf-8"});
-				global.copyVideo(pickSource(transitions.split("\n")), process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
+				global.copyVideo(pickSource(transitions.split("\n")), process.cwd()+"/shared/temp/video" + counter, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
 			} else {
-				global.snipVideo(sourceToPick, startOfClip, endOfClip, process.cwd()+"/shared/temp/video" + i, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
+				global.snipVideo(sourceToPick, startOfClip, endOfClip, process.cwd()+"/shared/temp/video" + counter, [toolbox.width, toolbox.height], toolbox.fps, toolbox.debug);
 			}
 			//Add a random effect to the video
 			let int;
@@ -57,29 +79,20 @@ function go(toolbox) {
 			if(int < toolbox.plugins.length && toolbox.plugins.length != 0) {
 				if(toolbox.plugins[int] != "") {
 					var effect = toolbox.plugins[int];
-					if(toolbox.debug)
-						console.log("\nSTARTING EFFECT ON CLIP " + i + " EFFECT " + effect);
-					var clipToWorkWith = process.cwd()+"/shared/temp/video" + i + ".mp4";
+					var clipToWorkWith = process.cwd()+"/shared/temp/video" + counter + ".mp4";
 					plugins[effect].plugin(clipToWorkWith, toolbox, process.cwd(), toolbox.debug);
 				}
 			}
-			if(!toolbox.silent)
-				bar.increment();
+			resolve();
+		} catch (ex) {
+			process.stdin.resume();
+			if(!toolbox.silent) {
+				console.log("\nAn error has occured.")
+				console.log("\n"+ex)
+			}
+			reject();
 		}
-		global.concatenateVideo(toolbox.clips, toolbox.output, toolbox.debug);
-	} catch (ex) {
-		process.stdin.resume();
-		if(!toolbox.silent) {
-			console.log("\nAn error has occured.")
-			console.log("\n"+ex)
-		}
-		return process.exit(1);
-	}
-	if(!toolbox.silent)
-		bar.update(toolbox.clips);
-	cleanUp(toolbox.clips);
-	fs.rmdirSync(process.cwd()+"/shared/temp/");
-	process.exit(0); //All done here
+	});
 }
 
 function randomvar(min, max) {
@@ -91,20 +104,6 @@ function randomvar(min, max) {
 	return finalVal;
 }
 
-
-function cleanUp(clips, debug) {
-	if (fs.existsSync(process.cwd()+"/shared/temp/temp.mp4"))
-		fs.unlinkSync(process.cwd()+"/shared/temp/temp.mp4");
-	if (fs.existsSync(process.cwd()+"/concat.txt"))
-		fs.unlinkSync(process.cwd()+"/concat.txt")
-	for (var i=0; i<clips; i++) {
-		if (fs.existsSync(process.cwd()+"/shared/temp/video"+i+".mp4")) {
-			fs.unlinkSync(process.cwd()+"/shared/temp/video"+i+".mp4");
-			if(debug)
-				console.log(i + " Exists");
-		}
-	}
-}
 function pickSource(tools) {
 	return tools[Math.floor(Math.random() * tools.length)] 
 }

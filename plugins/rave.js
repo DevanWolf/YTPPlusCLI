@@ -1,3 +1,4 @@
+/* CONVERTED FOR USE IN INFINITY */
 /* rave.js by TeamPopplio - Version 1.0.0 */
 
 const pluginConfig =
@@ -66,7 +67,7 @@ module.exports = {
 
 		//Copy video to a temporary file
 		if (fs.existsSync(input))
-			fs.renameSync(input,temp);
+			fs.copyFileSync(input,temp);
 
 		if (!fs.existsSync(cwd+"/"+pluginConfig.MusicDirectory))
 			fs.mkdirSync(cwd+"/"+pluginConfig.MusicDirectory)

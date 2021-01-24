@@ -1,3 +1,4 @@
+/* CONVERTED FOR USE IN INFINITY */
 const global = require("../global"),
 	fs = require("fs");
 module.exports = {
@@ -26,7 +27,7 @@ module.exports = {
 			fs.unlinkSync(temp6);
 		
 		if (fs.existsSync(input))
-			fs.renameSync(input,temp);
+			fs.copyFileSync(input,temp);
 
 		var soundDir = cwd + "/shared/music";
 

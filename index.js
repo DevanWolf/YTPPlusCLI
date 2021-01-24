@@ -27,7 +27,7 @@ if(argv.getplugins) {
 }
 /* Title */
 if(!argv.silent)
-	console.log(figlet.textSync('ytp+ cli', { horizontalLayout: 'full' }) + "\n" + package.homepage + " v" + version + "\nThis software is licensed under the GNU General Public License Version 3.0.");
+	console.log(figlet.textSync('ytp+ infinity', { horizontalLayout: 'full' }) + "\n" + package.homepage + " v" + version + "\nThis software is licensed under the GNU General Public License Version 3.0.");
 /* Errors and warnings */
 if(!fs.existsSync(process.cwd()+"/shared")) {
 	console.log("No shared directory found!\nThe 'shared' directory has been created in "+process.cwd());

@@ -1,3 +1,4 @@
+/* CONVERTED FOR USE IN INFINITY */
 const global = require("../global"),
 	fs = require("fs");
 module.exports = {
@@ -18,7 +19,7 @@ module.exports = {
 		if (fs.existsSync(temp))
 			fs.unlinkSync(temp);
 		if (fs.existsSync(video))
-			fs.renameSync(video,temp);
+			fs.copyFileSync(video,temp);
 		var command = " -i \"" + cwd + "/shared/temp/temp.mp4\""
 			+ " -i \"" + soundDir + "/" + randomSound + "\""
 			+ " -filter_complex \"[1:a]volume=1,apad[A];[0:a][A]amerge[out]\""

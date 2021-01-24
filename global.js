@@ -15,7 +15,8 @@ module.exports = {
         height: 480,
         fps: 30,
         usetransitions: false,
-        transitions: "transitions.txt"
+        transitions: "transitions.txt",
+        rtmpurl: "rtmp://localhost:1935/myapp/mystream"
     },
     /* Plugin consts */
     ffmpeg: ffmpeg,

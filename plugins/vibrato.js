@@ -1,3 +1,4 @@
+/* CONVERTED FOR USE IN INFINITY */
 const global = require("../global"),
 	fs = require("fs");
 module.exports = {
@@ -6,7 +7,7 @@ module.exports = {
 		if (fs.existsSync(temp))
 			fs.unlinkSync(temp);
 		if (fs.existsSync(video))
-			fs.renameSync(video,temp);
+			fs.copyFileSync(video,temp);
 		var command = " -i \"" + temp + "\""
 				+ " -ar 44100"
 				+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps
