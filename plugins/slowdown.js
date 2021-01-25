@@ -7,10 +7,7 @@ module.exports = {
 			fs.unlinkSync(temp);
 		if (fs.existsSync(video))
 			fs.renameSync(video,temp);
-		var command = " -i \"" + temp + "\""
-				+ " -ar 44100"
-				+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps
-				+ " -filter:v setpts=2*PTS -filter:a atempo=0.5 -y \"" + video + "\"";
+		var command = " -i \"" + temp + "\" -vf setpts=2*PTS -af atempo=.5 -y \"" + video + "\"";
 		global.ffmpeg.runSync(command + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		fs.unlinkSync(temp);
 		return true
