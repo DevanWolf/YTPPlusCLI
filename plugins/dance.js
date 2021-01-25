@@ -4,7 +4,7 @@ module.exports = {
 	plugin: (video, toolbox, cwd, debug) => {
 		var input = video,
 			temp = cwd + "/shared/temp/temp.mp4",
-			temp2 = cwd + "/shared/temp/temp2.mp4",
+			temp2 = cwd + "/shared/temp/temp2.mp4";
 		
 		// final result is backwards & forwards concatenated with music
 		
