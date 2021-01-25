@@ -19,17 +19,7 @@ module.exports = {
 			fs.unlinkSync(temp);
 		if (fs.existsSync(video))
 			fs.renameSync(video,temp);
-		var command = " -i \"" + cwd + "/shared/temp/temp.mp4\""
-			+ " -i \"" + soundDir + "/" + randomSound + "\""
-			+ " -filter_complex \"[1:a]volume=1,apad[A];[0:a][A]amerge[out]\""
-			+ " -ac 2"
-			//+ " -c:v copy"
-			
-			+ " -ar 44100"
-			+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps
-			+ " -map 0:v"
-			+ " -map [out]"
-			+ " -y \"" + video + "\"";
+		var command = " -i \"" + cwd + "/shared/temp/temp.mp4\" -i \"" + soundDir + "/" + randomSound + "\" -c:v copy -ar 44100 -ac 2 -filter_complex \"[0:a][1:a]amix,volume=2[out]\" -map 0:v -map [out] -shortest -map_metadata -1 -y \"" + video + "\"";
 		global.ffmpeg.runSync(command + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		fs.unlinkSync(temp);
 		return true
