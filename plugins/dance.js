@@ -3,12 +3,8 @@ const global = require("../global"),
 module.exports = {
 	plugin: (video, toolbox, cwd, debug) => {
 		var input = video,
-			temp = cwd + "/shared/temp/temp.mp4", //og file
-			temp2 = cwd + "/shared/temp/temp2.mp4", //1st cut
-			temp3 = cwd + "/shared/temp/temp3.mp4", //backwards (silent)
-			temp4 = cwd + "/shared/temp/temp4.mp4", //forwards (silent)
-			temp5 = cwd + "/shared/temp/temp5.mp4", //backwards & forwards concatenated
-			temp6 = cwd + "/shared/temp/temp6.mp4"; //backwards & forwards concatenated
+			temp = cwd + "/shared/temp/temp.mp4",
+			temp2 = cwd + "/shared/temp/temp2.mp4",
 		
 		// final result is backwards & forwards concatenated with music
 		
@@ -16,14 +12,6 @@ module.exports = {
 			fs.unlinkSync(temp);
 		if (fs.existsSync(temp2))
 			fs.unlinkSync(temp2);
-		if (fs.existsSync(temp3))
-			fs.unlinkSync(temp3);
-		if (fs.existsSync(temp4))
-			fs.unlinkSync(temp4);
-		if (fs.existsSync(temp5))
-			fs.unlinkSync(temp5);
-		if (fs.existsSync(temp6))
-			fs.unlinkSync(temp6);
 		
 		if (fs.existsSync(input))
 			fs.renameSync(input,temp);
@@ -35,8 +23,7 @@ module.exports = {
 
 		var readDir = fs.readdirSync(soundDir),
 			randomSound = readDir[global.randomInt(0,readDir.length-1)],
-			randomTime = global.randomInt(3,9),
-			randomTime2 = global.randomInt(0,1);
+			randomTime = (global.randomInt(3,19) / 10);
 
 		if(!randomSound) {
 			if(debug) console.log("\nNo sounds exist in directory '"+soundDir+"'!")
@@ -45,45 +32,11 @@ module.exports = {
 
 		let commands = [];
 
-		commands.push("-i \"" + temp + "\" -map 0"// -c:v copy"
-				+ " -ar 44100"
-				+ " -to 00:00:0"+randomTime2+"." + randomTime
-				+ " -vf scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1"
-				+ " -an"
-				+ " -y \"" + temp2 + "\"");
+		commands.push("-i \"" + temp + "\" -an -c:v copy -to " + randomTime + " -y \"" + temp2 + "\"");
 		
-		commands.push("-i \"" + temp2 + "\" -map 0"// -c:v copy"
-				+ " -ar 44100"
-				+ " -vf reverse,scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1"
-				+ " -y \"" + temp3 + "\"");
+		commands.push("-i \"" + temp2 + "\" -vf reverse -y \"" + temp + "\"");
 		
-		commands.push("-i \"" + temp3 + "\""
-				+ " -ar 44100"
-				+ " -vf reverse,scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1"
-				+ " -y \"" + temp4 + "\"");
-		
-		commands.push("-i \"" + temp3 + "\""
-				+ " -i " + temp4
-				+ " -filter_complex \"[0:v:0][1:v:0][0:v:0][1:v:0][0:v:0][1:v:0][0:v:0][1:v:0]concat=n=8:v=1[outv]\""
-				+ " -map \"[outv]\""
-				+ " -c:v libx264 -shortest"
-				+ " -y \"" + temp5 + "\"");
-		
-		commands.push("-i \"" + temp5 + "\""
-				+ " -map 0"
-				+ " -ar 44100"
-				+ " -vf \"setpts=0.5*PTS,scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1\""
-				+ " -af \"atempo=2.0\""
-				+ " -shortest"
-				+ " -y \"" + temp6 + "\"");
-		
-		commands.push("-i \"" + temp6 + "\""
-				+ " -i \"" + soundDir + "/" + randomSound + "\""
-				+ " -c:v libx264"
-				+ " -map 0:v:0 -map 1:a:0"
-				+ " -vf \"scale="+toolbox.width+"x"+toolbox.height+",setsar=1:1,fps=fps="+toolbox.fps+"\""
-				+ " -shortest"
-				+ " -y \"" + video + "\"");
+		commands.push("-i \"" + temp + "\" -i \"" + temp2 + "\" -i \"" + soundDir + "/" + randomSound + "\" -filter_complex \"[0:v][1:v][0:v][1:v][0:v][1:v][0:v][1:v]concat=n=8:v=1,setpts=.5*PTS[out]\" -map [out] -map 2:a -ar 44100 -ac 2 -disposition:a:0 default -shortest -map_metadata -1 -y \"" + video + "\"");
 		
 		for (var i = 0; i < commands.length; i++) {
 			global.ffmpeg.runSync(commands[i] + (debug == false ? " -hide_banner -loglevel quiet" : ""));
@@ -91,10 +44,6 @@ module.exports = {
 		
 		fs.unlinkSync(temp);
 		fs.unlinkSync(temp2);
-		fs.unlinkSync(temp3);
-		fs.unlinkSync(temp4);
-		fs.unlinkSync(temp5);
-		fs.unlinkSync(temp6);
 
 		return true
   	}
