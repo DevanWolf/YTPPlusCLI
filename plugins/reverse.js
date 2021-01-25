@@ -2,7 +2,7 @@ const global = require("../global"),
 	fs = require("fs");
 module.exports = {
 	plugin: (video, toolbox, cwd, debug) => {
-		var temp = cwd + "/shared/temp/temp.mp4",
+		var temp = cwd + "/shared/temp/temp.mp4";
 
 		if (fs.existsSync(temp))
 			fs.unlinkSync(temp);
