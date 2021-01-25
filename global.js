@@ -81,51 +81,27 @@ module.exports = {
     },
     /* Trims down videos to a specific time and length */
     snipVideo: (video, startTime, endTime, output, resolution, fps, debug) => {
-        var args = " -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}`
-            + "\" -ss " + startTime
-            + " -to " + endTime
-            + " -ac 1"
-            + " -ar 44100"
-            + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
-            + " -y"
-            + " \"" + output + ".mp4\"";
+        var args = " -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))} + "\" -ss " + startTime + " -to " + endTime + " -ar 44100 -ac 2 -vf scale=" + resolution[0]+"x" + resolution[1] + ",setsar=1:1,fps=fps=" + fps + " -map_metadata -1 -map_chapters -1 -y \"" + output + ".mp4\"";
         return ffmpeg.runSync(args + (debug == false ? " -hide_banner -loglevel quiet" : ""));
     },
     /* Copies videos to what is normally the temporary directory */
     copyVideo: (video, output, resolution, fps, debug) => {
-        var args =" -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))}`
-            + "\" -ar 44100"
-            + " -ac 1"
-            + " -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps
-            + " -y"
-            + " \"" + output + ".mp4\"";
+        var args =" -i \"" + `${video.replace(/\\/g,"\\\\").replace(/\//g,(process.platform === "win32" ? "\\\\" : "/"))} + "\" -ar 44100 -ac 2 -vf scale="+resolution[0]+"x"+resolution[1]+",setsar=1:1,fps=fps="+fps + " -map_metadata -1 -map_chapters -1 -y \"" + output + ".mp4\"";
         return ffmpeg.runSync(args + (debug == false ? " -hide_banner -loglevel quiet" : ""));
     },
     /* Writes a concat.txt and merges it together, this is unlike the original YTP+ as it now allows for any amount of video files
         This should NOT be used in plugins */
     concatenateVideo: (count, out, debug) => {
         var command1 = "";
+        let realcount = 0;
             
         for (var i=0; i<count; i++) {
             if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
                 command1 = command1.concat(" -i \""+process.cwd()+"/shared/temp/video" + i + ".mp4\"");
-            }
-        }
-        command1 = command1.concat(" -filter_complex \"");
-        
-        let realcount = 0;
-
-        for (var i=0; i<count; i++) {
-            if (fs.existsSync(process.cwd()+"/shared/temp/video" + i + ".mp4") == true) {
                 realcount+=1;
             }
         }
-
-        for (var i=0; i<realcount; i++) {
-            command1 = command1.concat("[" + i + ":v:0][" + i + ":a:0]");
-        }
-
-        command1=command1.concat("concat=n=" + realcount + ":v=1:a=1[outv][outa]\" -map \"[outv]\" -map \"[outa]\" -y \"" + out + "\""); 
+        command1=command1.concat(" -filter_complex \"concat=n=" + realcount + ":v=1:a=1[outv][outa]\" -map [outv] -map [outa] -map_metadata -1 -y \"" + out + "\""); 
 
         return ffmpeg.runSync(command1 + (debug == false ? " -hide_banner -loglevel quiet" : ""));
     },
