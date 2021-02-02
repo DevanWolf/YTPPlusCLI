@@ -9,7 +9,7 @@ module.exports = {
 		if (fs.existsSync(video))
 			fs.renameSync(video,temp);
 
-		var command = "-i \"" + temp + "\" -vf reverse -af areverse -y \"" + video + "\"";
+		var command = " -i \"" + temp + "\" -vf reverse -af areverse -y \"" + video + "\"";
 		global.ffmpeg.runSync(command + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		fs.unlinkSync(temp);
 		return true
