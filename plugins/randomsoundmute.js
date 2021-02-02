@@ -15,13 +15,11 @@ module.exports = {
 			if(debug) console.log("\nNo sounds exist in directory '"+soundDir+"'!")
 			return false
 		}
-
 		if (fs.existsSync(temp))
 			fs.unlinkSync(temp);
 		if (fs.existsSync(video))
 			fs.renameSync(video,temp);
-
-		var command = "-i \"" + temp + "\" -map 0:v -map 1:a -ar 44100 -ac 2 -c:v copy -disposition:a:0 default -shortest -map_metadata -1 -y \"" + video + "\"";
+		var command = " -i \"" + temp + "\" -map 0:v -map 1:a -ar 44100 -ac 2 -c:v copy -disposition:a:0 default -shortest -map_metadata -1 -y \"" + video + "\"";
 		global.ffmpeg.runSync(command + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		fs.unlinkSync(temp);
 		return true
