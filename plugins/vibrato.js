@@ -7,7 +7,7 @@ module.exports = {
 			fs.unlinkSync(temp);
 		if (fs.existsSync(video))
 			fs.renameSync(video,temp);
-		var command = " -i \"" + temp + "\" -c:v copy -af vibrato=f=7 -y \"" + video + "\"";
+		var command = "-i \"" + temp + "\" -c:v copy -af vibrato=f=7 -y \"" + video + "\"";
 		global.ffmpeg.runSync(command + (debug == false ? " -hide_banner -loglevel quiet" : ""));
 		fs.unlinkSync(temp);
 		return true
